@@ -1,0 +1,13 @@
+c:\users\kula\documents\visual studio 2012\Projects\RageControl\RageControl\bin\Debug\RageControl.exe.config
+c:\users\kula\documents\visual studio 2012\Projects\RageControl\RageControl\bin\Debug\RageControl.exe
+c:\users\kula\documents\visual studio 2012\Projects\RageControl\RageControl\bin\Debug\RageControl.pdb
+c:\users\kula\documents\visual studio 2012\Projects\RageControl\RageControl\bin\Debug\LeagueSharp.Common.dll
+c:\users\kula\documents\visual studio 2012\Projects\RageControl\RageControl\bin\Debug\LeagueSharp.dll
+c:\users\kula\documents\visual studio 2012\Projects\RageControl\RageControl\bin\Debug\SharpDX.Direct3D9.dll
+c:\users\kula\documents\visual studio 2012\Projects\RageControl\RageControl\bin\Debug\SharpDX.dll
+c:\users\kula\documents\visual studio 2012\Projects\RageControl\RageControl\bin\Debug\clipper_library.dll
+c:\users\kula\documents\visual studio 2012\Projects\RageControl\RageControl\bin\Debug\LeagueSharp.Sandbox.dll
+c:\users\kula\documents\visual studio 2012\Projects\RageControl\RageControl\bin\Debug\LeagueSharp.xml
+c:\users\kula\documents\visual studio 2012\Projects\RageControl\RageControl\obj\Debug\RageControl.csprojResolveAssemblyReference.cache
+c:\users\kula\documents\visual studio 2012\Projects\RageControl\RageControl\obj\Debug\RageControl.exe
+c:\users\kula\documents\visual studio 2012\Projects\RageControl\RageControl\obj\Debug\RageControl.pdb

@@ -20,7 +20,7 @@ namespace RageControl
         private const string CurseWarnPunish = "Time for you to STFU for a while don't you think?"; // 2000
         private static bool _isPunished;
 
-        static string[] _badWords = { "ass","fak", "bastard", "l2p", "fk", "cunt", "dick", "fuck", "kurwa", "shit", "suck", "mom", "kid", "noob", "retard", "report", "feeder", "bronzie", "nab", "tard", "idiot", "moron", "mother" };
+        static string[] _badWords = { "ass","fak", "bastard", "braindead", "l2p", "fk", "cunt", "dick", "fuck", "kurwa", "shit", "suck", "mom", "kid", "noob", "retard", "report", "feeder", "bronzie", "nab", "tard", "idiot", "moron", "mother" };
 
         public static void Main(string[] args)
         {

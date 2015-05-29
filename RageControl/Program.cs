@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Color = System.Drawing.Color;
-using Font = SharpDX.Direct3D9.Font;
+using Font = SharpDX.Direct3D9.Font; //will be used soon^tm
 using System.Timers;
 using LeagueSharp;
 using LeagueSharp.Common;
@@ -20,7 +22,8 @@ namespace RageControl
         private const string CurseWarnPunish = "Time for you to STFU for a while don't you think?"; // 2000
         private static bool _isPunished;
 
-        static string[] _badWords = { "ass","fak", "bastard", "braindead", "l2p", "fk", "cunt", "dick", "fuck", "kurwa", "shit", "suck", "mom", "kid", "noob", "retard", "report", "feeder", "bronzie", "nab", "tard", "idiot", "moron", "mother" };
+        static List <string> _badWords = new List<string> { "ass",  "cancer", "fak", "bastard", "braindead", "l2p", "fk", "cunt", "dick", "fuck", "kurwa", "shit", "suck", "mom", "kid", "noob", "retard", "report", "feeder", "bronzie", "nab", "tard", "idiot", "moron", "mother" };
+        static List<string>_whiteList = new List<string> { "cass", "afk", "faker", "Faker" };
 
         public static void Main(string[] args)
         {
@@ -30,47 +33,69 @@ namespace RageControl
         static void Game_OnGameLoad(EventArgs args)
         {
             (_main = new Menu("RageControl", "RageControl", true)).AddToMainMenu();
+          //  _main.AddItem(new MenuItem("Disable your chat", "playerCD").SetValue(false));
+
             Notifications.AddNotification("Rage Control Loaded!", 1000);
             Game.OnInput += Game_OnInput;
+           // _main.Item("playerCD").ValueChanged += Program_ValueChanged;
         }
+
 
         static void Game_OnInput(GameInputEventArgs args)
         {
             //AddNotification("Punished is " + _isPunished); hehe
+            //if (_main.Item("playerCD").GetValue<bool>())
+            //{
+            //    AddNotification(new Notification("Enable chat if you can handle it :)", 2000, true).SetTextColor(Color.ForestGreen).SetBoxColor(Color.DimGray));
+            //    args.Process = false;
+            //}
             if (_isPunished)
             {
                 args.Process = false;
                 Notifications.AddNotification(new Notification("Pssst...This is for your own good", 1000, true).SetTextColor(Color.DarkRed).SetBoxColor(Color.AntiqueWhite));
+                return;
             }
 
             foreach (var word in _badWords)
             {
                 if (!args.Input.Contains(word))
                     continue;
-                _curseWord = word;
-                args.Process = false;
-                _curseCount++;
+                    _curseWord = word;
+                    args.Process = false;
+                    _curseCount++;
+            }
+            foreach (var white in _whiteList)
+            {
+                if (!args.Input.Contains(white))
+                    continue;
+                args.Process = true;
                 break;
             }
             if (args.Process == false)
             {
-                Notifications.AddNotification(new Notification(CurseWarn + _curseWord, 2000, true).SetTextColor(Color.OrangeRed).SetBoxColor(Color.Gray));
+                Notifications.AddNotification(
+                    new Notification(CurseWarn + _curseWord, 2000, true).SetTextColor(Color.OrangeRed)
+                        .SetBoxColor(Color.Gray));
                 if (_curseCount >= 4 && _curseCount < 7)
                 {
-                    Notifications.AddNotification(new Notification(CurseWarnBig, 2000, true).SetTextColor(Color.Red).SetTextColor(Color.Gray));
+                    Notifications.AddNotification(
+                        new Notification(CurseWarnBig, 2000, true).SetTextColor(Color.Red).SetTextColor(Color.Gray));
                 }
                 else if (_curseCount >= 7 && _curseCount < 9)
                 {
-                    Notifications.AddNotification(new Notification(CurseWarnBIK, 200, true).SetTextColor(Color.DarkRed).SetBoxColor(Color.FromArgb(105, 105, 105)));
+                    Notifications.AddNotification(
+                        new Notification(CurseWarnBIK, 200, true).SetTextColor(Color.DarkRed)
+                            .SetBoxColor(Color.FromArgb(105, 105, 105)));
                 }
                 else if (_curseCount == 9)
-                    Notifications.AddNotification(new Notification(CurseWarnFinal, 2000, true).SetTextColor(Color.FromArgb(255, 30, 30)));
+                    Notifications.AddNotification(
+                        new Notification(CurseWarnFinal, 2000, true).SetTextColor(Color.FromArgb(255, 30, 30)));
 
                 else if (_curseCount >= 10)
                 {
                     AddNotification(CurseWarnPunish);
                     _isPunished = true;
-                    var stfu = new Timer { Interval = 1000 * (_curseCount * 10), Enabled = true, AutoReset = false };
+                    var stfu = new Timer {Interval = 1000*(_curseCount*10), Enabled = true, AutoReset = false};
                     _startTime = DateTime.Now;
                     stfu.Start();
                     stfu.Elapsed += stfu_Elapsed;
@@ -95,6 +120,15 @@ namespace RageControl
         public static void AddNotification(Notification notification)
         {
             Notifications.AddNotification(notification);
+        }
+        static void Program_ValueChanged(object sender, OnValueChangeEventArgs e)
+        {
+            if (_main.Item("playerCD").GetValue<bool>())
+                AddNotification(new Notification("Your chat dissabled").SetTextColor(Color.Red).SetBoxColor(Color.Black));
+            else if (_main.Item("playerCD").GetValue<bool>())
+                AddNotification(new Notification("Your chat enabled").SetTextColor(Color.Green).SetBoxColor(Color.Gray));
+            else
+                AddNotification(new Notification("An error detected! Tell Foxy ASAP! ERROR CODE: -12 ").SetTextColor(Color.White).SetBoxColor(Color.Blue));
         }
     }
 }

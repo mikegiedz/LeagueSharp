@@ -86,7 +86,7 @@ namespace RageControl
             if (_isPunished)
             {
                 args.Process = false;
-                Notifications.AddNotification(new Notification("Pssst...This is for your own good", 1000, true).SetTextColor(Color.DarkRed).SetBoxColor(Color.AntiqueWhite));
+                Notifications.AddNotification(new Notification("Pssst...This is for your own good", 10000 * (_curseCount * 10), true).SetTextColor(Color.DarkRed).SetBoxColor(Color.AntiqueWhite));
                 return;
             }
 

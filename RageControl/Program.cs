@@ -67,7 +67,7 @@ namespace RageControl
                 var file = new StreamReader(path + "whiteListRC.txt");
                 while ((line = file.ReadLine()) != null)
                 {
-                    if (line.Contains("#"))
+                    if (line.StartsWith("#"))
                         continue;
                     _whiteList.Add(line);
                 }

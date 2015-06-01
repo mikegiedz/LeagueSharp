@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using Color = System.Drawing.Color;
 using Font = SharpDX.Direct3D9.Font; //will be used soon^tm
 using System.Timers;
 using LeagueSharp;
 using LeagueSharp.Common;
+using LeagueSharp.Sandbox;
+
 
 namespace RageControl
 {
     internal class Program
     {
+        #region VarDeclarations
         static Menu _main;
         private static DateTime _startTime;
         private static int _curseCount;
@@ -21,7 +24,7 @@ namespace RageControl
         private const string CurseWarnFinal = "This is your final warning!"; // 2000
         private const string CurseWarnPunish = "Time for you to STFU for a while don't you think?"; // 2000
         private static bool _isPunished;
-
+        #endregion
         static List <string> _badWords = new List<string> { "ass",  "cancer", "fak", "bastard", "braindead", "l2p", "fk", "cunt", "dick", "fuck", "kurwa", "shit", "suck", "mom", "kid", "noob", "retard", "report", "feeder", "bronzie", "nab", "tard", "idiot", "moron", "mother" };
         static List<string>_whiteList = new List<string> { "cass", "afk", "faker", "Faker" };
 
@@ -34,21 +37,52 @@ namespace RageControl
         {
             (_main = new Menu("RageControl", "RageControl", true)).AddToMainMenu();
           //  _main.AddItem(new MenuItem("Disable your chat", "playerCD").SetValue(false));
-
             Notifications.AddNotification("Rage Control Loaded!", 1000);
+            Notifications.AddNotification("Reading files....", 1000);
+            ReadFiles(SandboxConfig.DataDirectory);
             Game.OnInput += Game_OnInput;
-           // _main.Item("playerCD").ValueChanged += Program_ValueChanged;
+        }
+
+        private static void ReadFiles(string path)
+        {
+            string line;
+            try
+            {
+                var file = new StreamReader(path + "blackListRC.txt");
+                while ((line = file.ReadLine()) != null)
+                {
+                    if (line.Contains("#"))
+                        continue;
+                    _badWords.Add(line);
+                }
+                line = string.Empty;
+                Notifications.AddNotification(new Notification("BlackList loaded",1000).SetBoxColor(Color.WhiteSmoke).SetTextColor(Color.Green));
+            }
+            catch (Exception e)
+            {
+                Notifications.AddNotification(new Notification("Error with blacklist: " + e.Message, 2000, true).SetBoxColor(Color.Black).SetTextColor(Color.Red));
+            }
+            try
+            {
+                var file = new StreamReader(path + "whiteListRC.txt");
+                while ((line = file.ReadLine()) != null)
+                {
+                    if (line.Contains("#"))
+                        continue;
+                    _whiteList.Add(line);
+                }
+                line = string.Empty;
+                Notifications.AddNotification(new Notification("WhiteList loaded",1000).SetBoxColor(Color.WhiteSmoke).SetTextColor(Color.Green));
+            }
+            catch (Exception e)
+            {
+                Notifications.AddNotification(new Notification("Error with whitelist" + e.Message).SetBoxColor(Color.Black).SetTextColor(Color.Red));
+            }
         }
 
 
         static void Game_OnInput(GameInputEventArgs args)
         {
-            //AddNotification("Punished is " + _isPunished); hehe
-            //if (_main.Item("playerCD").GetValue<bool>())
-            //{
-            //    AddNotification(new Notification("Enable chat if you can handle it :)", 2000, true).SetTextColor(Color.ForestGreen).SetBoxColor(Color.DimGray));
-            //    args.Process = false;
-            //}
             if (_isPunished)
             {
                 args.Process = false;
@@ -93,7 +127,7 @@ namespace RageControl
 
                 else if (_curseCount >= 10)
                 {
-                    AddNotification(CurseWarnPunish);
+                    Notifications.AddNotification(new Notification (CurseWarnPunish).SetBoxColor(Color.Black).SetTextColor(Color.Red));
                     _isPunished = true;
                     var stfu = new Timer {Interval = 1000*(_curseCount*10), Enabled = true, AutoReset = false};
                     _startTime = DateTime.Now;
@@ -112,23 +146,21 @@ namespace RageControl
         {
             _isPunished = false;
         }
-        public static void AddNotification(string text)
-        {
-            var notification = new Notification(text, 1000);
-            Notifications.AddNotification(notification);
-        }
-        public static void AddNotification(Notification notification)
-        {
-            Notifications.AddNotification(notification);
-        }
-        static void Program_ValueChanged(object sender, OnValueChangeEventArgs e)
-        {
-            if (_main.Item("playerCD").GetValue<bool>())
-                AddNotification(new Notification("Your chat dissabled").SetTextColor(Color.Red).SetBoxColor(Color.Black));
-            else if (_main.Item("playerCD").GetValue<bool>())
-                AddNotification(new Notification("Your chat enabled").SetTextColor(Color.Green).SetBoxColor(Color.Gray));
-            else
-                AddNotification(new Notification("An error detected! Tell Foxy ASAP! ERROR CODE: -12 ").SetTextColor(Color.White).SetBoxColor(Color.Blue));
-        }
+      //  public static void AddNotification(Notification notification)
+      //  {
+      //      Notifications.AddNotification(notification);
+      //  }
+        #region MenuItemProblem
+        //static void Program_ValueChanged(object sender, OnValueChangeEventArgs e)
+        //{
+        //    if (_main.Item("playerCD").GetValue<bool>())
+        //        AddNotification(new Notification("Your chat dissabled").SetTextColor(Color.Red).SetBoxColor(Color.Black));
+        //    else if (_main.Item("playerCD").GetValue<bool>())
+        //        AddNotification(new Notification("Your chat enabled").SetTextColor(Color.Green).SetBoxColor(Color.Gray));
+        //    else
+        //        AddNotification(new Notification("An error detected! Tell Foxy ASAP! ERROR CODE: -12 ").SetTextColor(Color.White).SetBoxColor(Color.Blue));
+        //}
+        #endregion
+
     }
 }

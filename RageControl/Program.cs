@@ -51,7 +51,7 @@ namespace RageControl
                 var file = new StreamReader(path + "blackListRC.txt");
                 while ((line = file.ReadLine()) != null)
                 {
-                    if (line.Contains("#"))
+                    if (line.StartsWith("#"))
                         continue;
                     _badWords.Add(line);
                 }

@@ -33,6 +33,7 @@ namespace RageControl
             CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
         }
 
+
         static void Game_OnGameLoad(EventArgs args)
         {
             (_main = new Menu("RageControl", "RageControl", true)).AddToMainMenu();
@@ -87,6 +88,7 @@ namespace RageControl
             {
                 args.Process = false;
                 Notifications.AddNotification(new Notification("Pssst...This is for your own good", 10000 * (_curseCount * 10), true).SetTextColor(Color.DarkRed).SetBoxColor(Color.AntiqueWhite));
+                Notifications.AddNotification(new Notification(TimeLeft(_startTime),2000).SetBoxColor(Color.Orange).SetTextColor(Color.Red));
                 return;
             }
 
@@ -118,7 +120,7 @@ namespace RageControl
                 else if (_curseCount >= 7 && _curseCount < 9)
                 {
                     Notifications.AddNotification(
-                        new Notification(CurseWarnBIK, 200, true).SetTextColor(Color.DarkRed)
+                        new Notification(CurseWarnBIK, 200, true).SetTextColor(Color.Crimson)
                             .SetBoxColor(Color.FromArgb(105, 105, 105)));
                 }
                 else if (_curseCount == 9)

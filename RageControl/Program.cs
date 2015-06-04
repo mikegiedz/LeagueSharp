@@ -25,7 +25,7 @@ namespace RageControl
         private const string CurseWarnPunish = "Time for you to STFU for a while don't you think?"; // 2000
         private static bool _isPunished;
         #endregion
-        static List <string> _badWords = new List<string> { "ass",  "cancer", "fak", "bastard", "braindead", "l2p", "fk", "cunt", "dick", "fuck", "kurwa", "shit", "suck", "mom", "kid", "noob", "retard", "report", "feeder", "bronzie", "nab", "tard", "idiot", "moron", "mother" };
+        static List <string> _badWords = new List<string> { "ass", "fck", "cancer", "fak", "fcuk","bastard", "braindead", "l2p", "fk", "cunt", "dick", "fuck", "kurwa", "shit", "suck", "mom", "kid", "noob", "retard", "report", "feeder", "bronzie", "nab", "tard", "idiot", "moron", "mother" };
         static List<string>_whiteList = new List<string> { "cass", "afk", "faker", "Faker" };
 
         public static void Main(string[] args)
@@ -77,7 +77,7 @@ namespace RageControl
             }
             catch (Exception e)
             {
-                Notifications.AddNotification(new Notification("Error with whitelist" + e.Message).SetBoxColor(Color.Black).SetTextColor(Color.Red));
+                Notifications.AddNotification(new Notification("Error with whitelist" + e.Message,1000).SetBoxColor(Color.Black).SetTextColor(Color.Red));
             }
         }
 

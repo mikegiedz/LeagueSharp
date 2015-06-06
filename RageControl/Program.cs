@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using Color = System.Drawing.Color;
 using Font = SharpDX.Direct3D9.Font; //will be used soon^tm
 using System.Timers;
@@ -40,37 +41,61 @@ namespace RageControl
         static void Game_OnGameLoad(EventArgs args)
         {
             #region Menuz
+            AllPlayers = ObjectManager.Get<Obj_AI_Hero>().ToList();
             (_main = new Menu("RageControl", "RageControl", true)).AddToMainMenu();
             var enableChatMenu = _main.AddSubMenu(new Menu("Disable your chat", "dyc"));
             enableChatMenu.AddItem(new MenuItem("disable", "Disable?").SetValue(false));
-           // var bannedPlayers = _main.AddSubMenu(new Menu("Ban Player?", "bannedPlayer"));
-           // Debug.Assert(AllPlayers != null, "AllPlayers != null");
-           //// foreach (var player in AllPlayers)
-           // {
-           //     bannedPlayers.AddItem(new MenuItem(player.Name, "Ban " + player.Name + "?").SetValue(false));
-           // }
-           // foreach (var item in bannedPlayers.Items)
-           // {
-           //     item.ValueChanged += item_ValueChanged;
-           // }
+            var bannedPlayers = _main.AddSubMenu(new Menu("Ban Player?", "bannedPlayer"));
             #endregion
             Notifications.AddNotification("Rage Control Loaded!", 1000);
             Notifications.AddNotification("Reading files....", 1000);
             ReadFiles(SandboxConfig.DataDirectory);
             _main.Item("disable").ValueChanged+=Program_ValueChanged;
+            if (AllPlayers != null)
+            {
+                foreach (var player in AllPlayers)
+                {
+                    Console.WriteLine(player.Name);
+                }
+                foreach (var player in AllPlayers)
+                {
+                    bannedPlayers.AddItem(new MenuItem(player.Name, "Ban " + player.Name + "?").SetValue(false));
+                }
+                foreach (var item in bannedPlayers.Items)
+                {
+                    item.ValueChanged += item_ValueChanged;
+                }
+            }
             Game.OnInput += Game_OnInput;
+            Game.OnChat += Game_OnChat;
+        }
+        //going to switch totaly to OnChat sooon....
+        static void Game_OnChat(GameChatEventArgs args)
+        {
+            if (BannedPlayers.Contains(args.Sender.Name))
+            {
+                Notifications.AddNotification(new Notification(args.Sender.Name + "'s message is blocked", 1500).SetTextColor(Color.Orange).SetBoxColor(Color.Black));
+                args.Process = false;
+                return;
+            }
         }
         static void item_ValueChanged(object sender, OnValueChangeEventArgs e)
         {
-            var newSender = (MenuItem)sender;
-            Debug.Assert(sender != null, "theSender != null");
-            if (newSender.GetValue<bool>())
+            if (sender == null)
+            {
+                Notifications.AddNotification(new Notification("sender is null", 3000));
+                return;
+            }
+            var newSender = sender as MenuItem;
+            if (e.GetNewValue<bool>())
             {
                 BannedPlayers.Add(newSender.Name);
+                Notifications.AddNotification(new Notification(newSender.Name + " banned!",2000).SetBoxColor(Color.Black).SetTextColor(Color.Orange));
             }
             else
             {
                 BannedPlayers.Remove(newSender.Name);
+                Notifications.AddNotification(new Notification(newSender.Name + " unbaned! :)", 2000).SetBoxColor(Color.Black).SetTextColor(Color.GreenYellow));
             }
         }
         private static void ReadFiles(string path)
@@ -123,7 +148,7 @@ namespace RageControl
             {
                 args.Process = false;
                 Notifications.AddNotification(new Notification("Pssst...This is for your own good", 1500, true).SetTextColor(Color.DarkRed).SetBoxColor(Color.AntiqueWhite));
-                Notifications.AddNotification(new Notification(TimeLeft(_startTime),2000).SetBoxColor(Color.Orange).SetTextColor(Color.Red));
+                Notifications.AddNotification(new Notification(TimeLeft(_startTime),2000).SetBoxColor(Color.Black).SetTextColor(Color.Red));
                 return;
             }
 
@@ -145,8 +170,7 @@ namespace RageControl
             if (args.Process == false)
             {
                 Notifications.AddNotification(
-                    new Notification(CurseWarn + _curseWord, 2000, true).SetTextColor(Color.OrangeRed)
-                        .SetBoxColor(Color.Gray));
+                    new Notification(CurseWarn + _curseWord, 2000, true).SetTextColor(Color.FromArgb(255,100,0)).SetBoxColor(Color.Gray));
                 if (_curseCount >= 4 && _curseCount < 7)
                 {
                     Notifications.AddNotification(

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using Color = System.Drawing.Color;
 using Font = SharpDX.Direct3D9.Font; //will be used soon^tm
@@ -27,6 +28,8 @@ namespace RageControl
         #endregion
         static List <string> _badWords = new List<string> { "ass", "fck", "cancer", "fak", "fcuk","bastard", "braindead", "l2p", "fk", "cunt", "dick", "fuck", "kurwa", "shit", "suck", "mom", "kid", "noob", "retard", "report", "feeder", "bronzie", "nab", "tard", "idiot", "moron", "mother" };
         static List<string>_whiteList = new List<string> { "cass", "afk", "faker", "Faker" };
+        static List<Obj_AI_Hero> AllPlayers;
+        static List<string> BannedPlayers = new List<string>();
 
         public static void Main(string[] args)
         {
@@ -36,14 +39,40 @@ namespace RageControl
 
         static void Game_OnGameLoad(EventArgs args)
         {
+            #region Menuz
             (_main = new Menu("RageControl", "RageControl", true)).AddToMainMenu();
-          //  _main.AddItem(new MenuItem("Disable your chat", "playerCD").SetValue(false));
+            var enableChatMenu = _main.AddSubMenu(new Menu("Disable your chat", "dyc"));
+            enableChatMenu.AddItem(new MenuItem("disable", "Disable?").SetValue(false));
+           // var bannedPlayers = _main.AddSubMenu(new Menu("Ban Player?", "bannedPlayer"));
+           // Debug.Assert(AllPlayers != null, "AllPlayers != null");
+           //// foreach (var player in AllPlayers)
+           // {
+           //     bannedPlayers.AddItem(new MenuItem(player.Name, "Ban " + player.Name + "?").SetValue(false));
+           // }
+           // foreach (var item in bannedPlayers.Items)
+           // {
+           //     item.ValueChanged += item_ValueChanged;
+           // }
+            #endregion
             Notifications.AddNotification("Rage Control Loaded!", 1000);
             Notifications.AddNotification("Reading files....", 1000);
             ReadFiles(SandboxConfig.DataDirectory);
+            _main.Item("disable").ValueChanged+=Program_ValueChanged;
             Game.OnInput += Game_OnInput;
         }
-
+        static void item_ValueChanged(object sender, OnValueChangeEventArgs e)
+        {
+            var newSender = (MenuItem)sender;
+            Debug.Assert(sender != null, "theSender != null");
+            if (newSender.GetValue<bool>())
+            {
+                BannedPlayers.Add(newSender.Name);
+            }
+            else
+            {
+                BannedPlayers.Remove(newSender.Name);
+            }
+        }
         private static void ReadFiles(string path)
         {
             string line;
@@ -84,10 +113,16 @@ namespace RageControl
 
         static void Game_OnInput(GameInputEventArgs args)
         {
+            if (_main.Item("disable").GetValue<bool>())
+            {
+                Notifications.AddNotification("You disabled chat :S",1500).Border(true).SetBoxColor(Color.Black).SetTextColor(Color.Orange).SetBorderColor(Color.Red);
+                args.Process = false;
+                return;
+            }
             if (_isPunished)
             {
                 args.Process = false;
-                Notifications.AddNotification(new Notification("Pssst...This is for your own good", 10000 * (_curseCount * 10), true).SetTextColor(Color.DarkRed).SetBoxColor(Color.AntiqueWhite));
+                Notifications.AddNotification(new Notification("Pssst...This is for your own good", 1500, true).SetTextColor(Color.DarkRed).SetBoxColor(Color.AntiqueWhite));
                 Notifications.AddNotification(new Notification(TimeLeft(_startTime),2000).SetBoxColor(Color.Orange).SetTextColor(Color.Red));
                 return;
             }
@@ -129,7 +164,7 @@ namespace RageControl
 
                 else if (_curseCount >= 10)
                 {
-                    Notifications.AddNotification(new Notification (CurseWarnPunish).SetBoxColor(Color.Black).SetTextColor(Color.Red));
+                    Notifications.AddNotification(new Notification(CurseWarnPunish, 1000 * (_curseCount * 10)).SetBoxColor(Color.Black).SetTextColor(Color.Red));
                     _isPunished = true;
                     var stfu = new Timer {Interval = 1000*(_curseCount*10), Enabled = true, AutoReset = false};
                     _startTime = DateTime.Now;
@@ -140,7 +175,7 @@ namespace RageControl
         }
         private static string TimeLeft(DateTime start)
         {
-            var timeLeft = start - DateTime.Now;
+            var timeLeft = start.AddSeconds(1000 * (_curseCount * 10)) - DateTime.Now;
             return timeLeft.ToString();
         }
 
@@ -148,20 +183,19 @@ namespace RageControl
         {
             _isPunished = false;
         }
-      //  public static void AddNotification(Notification notification)
-      //  {
-      //      Notifications.AddNotification(notification);
-      //  }
         #region MenuItemProblem
-        //static void Program_ValueChanged(object sender, OnValueChangeEventArgs e)
-        //{
-        //    if (_main.Item("playerCD").GetValue<bool>())
-        //        AddNotification(new Notification("Your chat dissabled").SetTextColor(Color.Red).SetBoxColor(Color.Black));
-        //    else if (_main.Item("playerCD").GetValue<bool>())
-        //        AddNotification(new Notification("Your chat enabled").SetTextColor(Color.Green).SetBoxColor(Color.Gray));
-        //    else
-        //        AddNotification(new Notification("An error detected! Tell Foxy ASAP! ERROR CODE: -12 ").SetTextColor(Color.White).SetBoxColor(Color.Blue));
-        //}
+        static void Program_ValueChanged(object sender, OnValueChangeEventArgs e)
+        {
+            if (!_main.Item("disable").GetValue<bool>())
+                Notifications.AddNotification(new Notification("Yours chat dissabled",2000).SetTextColor(Color.Red).SetBoxColor(Color.Black));
+            else if (_main.Item("disable").GetValue<bool>())
+                Notifications.AddNotification(new Notification("Yours chat enabled",2000).SetTextColor(Color.Green).SetBoxColor(Color.Black));
+            else
+            {
+                Notifications.AddNotification(new Notification("Ayee!!error detected! Tell Foxy ASAP! ERROR CODE: -2").SetTextColor(Color.White).SetBoxColor(Color.Blue));
+                Console.WriteLine("Value: " + _main.Item("disable").GetValue<bool>());
+            }
+        }
         #endregion
 
     }

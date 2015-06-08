@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Color = System.Drawing.Color;
@@ -42,6 +41,8 @@ namespace RageControl
         {
             #region Menuz
             AllPlayers = ObjectManager.Get<Obj_AI_Hero>().ToList();
+            if (AllPlayers.Contains(ObjectManager.Player))
+                AllPlayers.Remove(ObjectManager.Player);
             (_main = new Menu("RageControl", "RageControl", true)).AddToMainMenu();
             var enableChatMenu = _main.AddSubMenu(new Menu("Disable your chat", "dyc"));
             enableChatMenu.AddItem(new MenuItem("disable", "Disable?").SetValue(false));
@@ -53,10 +54,6 @@ namespace RageControl
             _main.Item("disable").ValueChanged+=Program_ValueChanged;
             if (AllPlayers != null)
             {
-                foreach (var player in AllPlayers)
-                {
-                    Console.WriteLine(player.Name);
-                }
                 foreach (var player in AllPlayers)
                 {
                     bannedPlayers.AddItem(new MenuItem(player.Name, "Ban " + player.Name + "?").SetValue(false));

@@ -1,15 +1,10 @@
 ﻿using System.IO;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using LeagueSharp;
 using LeagueSharp.Common;
 using LeagueSharp.Sandbox;
 using Color = System.Drawing.Color;
-using System.Threading.Tasks;
-using System.Drawing;
-using System.Timers;
+
 
 namespace ChatLogger
 {

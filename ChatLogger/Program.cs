@@ -6,7 +6,7 @@ using System.Text;
 using LeagueSharp;
 using LeagueSharp.Common;
 using LeagueSharp.Sandbox;
-using Colorz = System.Drawing.Color;
+using Color = System.Drawing.Color;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.Timers;
@@ -17,7 +17,7 @@ namespace ChatLogger
     class Program
     {
         static Menu main;
-        static string _path = SandboxConfig.DataDirectory + "\\ChatlogTest.txt";
+        static string _path = SandboxConfig.DataDirectory + "\\Chatlog.txt";
       //  static string now = DateTime.Today.ToString(CultureInfo.InvariantCulture);
       //  static StreamWriter file = new StreamWriter(path + "\\"+ DateTime.Today + "ChatLog.txt", true);
         static void Main(string[] args)
@@ -27,7 +27,7 @@ namespace ChatLogger
         
         static void Game_OnGameLoad(EventArgs args)
         {
-            Notifications.AddNotification(new Notification("ChatLogger loaded!"));
+            Notifications.AddNotification(new Notification("ChatLogger loaded!",1000).SetBoxColor(Color.WhiteSmoke).SetTextColor(Color.Green));
             (main = new Menu("Chat Logger","chatlogger",true)).AddToMainMenu();
             var enabler = main.AddItem(new MenuItem("enabled","Enabled?").SetValue(false));
             var nottify = main.AddItem(new MenuItem("notify", "Show Notifications").SetValue(true));
@@ -36,6 +36,12 @@ namespace ChatLogger
 
             enabler.ValueChanged += EnablerValueChanged;
             Game.OnChat +=Game_OnChat;
+            CustomEvents.Game.OnGameEnd += Game_OnGameEnd;
+        }
+
+        static void Game_OnGameEnd(EventArgs args)
+        {
+            File.Move(_path,SandboxConfig.DataDirectory+"\\ChatLog"+1+"txt");
         }
 
         static void EnablerValueChanged(object sender, OnValueChangeEventArgs e)
@@ -67,7 +73,7 @@ namespace ChatLogger
             }
             catch (Exception e)
             {
-                Notifications.AddNotification("ChatLog error: " + e.Message);
+                //Notifications.AddNotification("ChatLog error: " + e.Message,1000);
             }
         }
     }

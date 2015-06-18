@@ -1,1 +1,1 @@
-c:\Users\Kula\Documents\Visual Studio 2012\Projects\ChatLogger\ChatLogger\bin\Release\ChatLogger.exe.config
+C:\Users\Kula\documents\visual studio 2012\Projects\ChatLogger\ChatLogger\bin\Release\ChatLogger.exe.config

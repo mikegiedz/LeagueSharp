@@ -8,6 +8,7 @@ using Color = System.Drawing.Color;
 
 namespace ChatLogger
 {
+    using System.Text;
 
     class Program
     {
@@ -26,7 +27,7 @@ namespace ChatLogger
             (main = new Menu("Chat Logger","chatlogger",true)).AddToMainMenu();
             var enabler = main.AddItem(new MenuItem("enabled","Enabled?").SetValue(false));
             var nottify = main.AddItem(new MenuItem("notify", "Show Notifications").SetValue(true));
-            
+            var delay = main.AddItem(new MenuItem("delay", "Logging Delay(ms)").SetValue(new Slider(0, 0, 10000)));
             //File.Create(SandboxConfig.DataDirectory + "\\ChatlogTest");
 
             enabler.ValueChanged += EnablerValueChanged;
@@ -52,7 +53,7 @@ namespace ChatLogger
             if (!main.Item("enabled").GetValue<bool>())
                 return;
             try{
-                var stream = new StreamWriter(_path, true);
+                var stream = new StreamWriter(_path, true, Encoding.UTF8);
                 if (args.Sender.IsAlly)
                 {
                     stream.WriteLine("[" + Utils.FormatTime(Game.ClockTime) + "]" + " sender: " + args.Sender.Name + " says: " + args.Message);
@@ -65,6 +66,8 @@ namespace ChatLogger
                 }
                 if (main.Item("notify").GetValue<bool>())
                     Notifications.AddNotification(new Notification("Chat loged",500).SetBoxColor(Color.Black).SetTextColor(Color.Green));
+                if (main.Item("delay").GetValue<int>()!=0)
+                    System.Threading.Thread.Sleep(main.Item("delay").GetValue<int>());
             }
             catch (Exception e)
             {

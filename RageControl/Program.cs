@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Color = System.Drawing.Color;
-using Font = SharpDX.Direct3D9.Font; //will be used soon^tm
+using Font = SharpDX.Direct3D9.Font; 
 using System.Timers;
 using LeagueSharp;
 using LeagueSharp.Common;

@@ -25,6 +25,8 @@ namespace RageControl
         private const string CurseWarnFinal = "This is your final warning!"; // 2000
         private const string CurseWarnPunish = "Time for you to STFU for a while don't you think?"; // 2000
         private static bool _isPunished;
+        private static bool _isPermaDissabled = false;
+        private static bool _isDissabled = false;
         #endregion
         static List <string> _badWords = new List<string> { "ass", "fck", "cancer", "fak", "fcuk","bastard", "braindead", "l2p", "fk", "cunt", "dick", "fuck", "kurwa", "shit", "suck", "mom", "kid", "noob", "retard", "report", "feeder", "bronzie", "nab", "tard", "idiot", "moron", "mother" };
         static List<string>_whiteList = new List<string> { "cass", "afk", "faker", "Faker" };
@@ -45,13 +47,16 @@ namespace RageControl
                 AllPlayers.Remove(ObjectManager.Player);
             (_main = new Menu("RageControl", "RageControl", true)).AddToMainMenu();
             var enableChatMenu = _main.AddSubMenu(new Menu("Disable your chat", "dyc"));
-            enableChatMenu.AddItem(new MenuItem("disable", "Disable?").SetValue(false));
+            enableChatMenu.AddItem(new MenuItem("disable", "Disable?").SetValue(false).DontSave());
+            enableChatMenu.AddItem(new MenuItem("!PERMA! Disable", "perma").SetValue(false).DontSave());
             var bannedPlayers = _main.AddSubMenu(new Menu("Ban Player?", "bannedPlayer"));
             #endregion
             Notifications.AddNotification("Rage Control Loaded!", 1000);
             Notifications.AddNotification("Reading files....", 1000);
             ReadFiles(SandboxConfig.DataDirectory);
             _main.Item("disable").ValueChanged+=Program_ValueChanged;
+            _main.Item("perma").ValueChanged+=PermaDissable;
+
             if (AllPlayers != null)
             {
                 foreach (var player in AllPlayers)
@@ -66,7 +71,21 @@ namespace RageControl
             Game.OnInput += Game_OnInput;
             Game.OnChat += Game_OnChat;
         }
+
+        private static void PermaDissable(object sender, OnValueChangeEventArgs e)
+        {
+            var Sender = sender as MenuItem;
+            if (e.GetNewValue<bool>())
+            {
+                _isPermaDissabled = true;
+                Notifications.AddNotification(new Notification("Chat Perma Dissabled!",3000).SetBorderColor(Color.Red).SetBoxColor(Color.Black).SetTextColor(Color.Red));
+                return;
+            }
+            Notifications.AddNotification(new Notification("Pssssst remember? :) Try unloading the assembly", 4000).SetBorderColor(Color.Yellow).SetBoxColor(Color.Black).SetTextColor(Color.Orange));
+            Sender.SetValue(e.GetOldValue<bool>());
+        }
         //going to switch totaly to OnChat sooon....
+        //nah.... It works so it's fine :P
         static void Game_OnChat(GameChatEventArgs args)
         {
             if (BannedPlayers.Contains(args.Sender.Name))
@@ -135,7 +154,7 @@ namespace RageControl
 
         static void Game_OnInput(GameInputEventArgs args)
         {
-            if (_main.Item("disable").GetValue<bool>())
+            if (_isDissabled || _isPermaDissabled==true)
             {
                 Notifications.AddNotification("You disabled chat :S",1500).Border(true).SetBoxColor(Color.Black).SetTextColor(Color.Orange).SetBorderColor(Color.Red);
                 args.Process = false;
@@ -168,24 +187,24 @@ namespace RageControl
             {
                 Notifications.AddNotification(
                     new Notification(CurseWarn + _curseWord, 2000, true).SetTextColor(Color.FromArgb(255,100,0)).SetBoxColor(Color.Gray));
-                if (_curseCount >= 4 && _curseCount < 7)
+                if (_curseCount >= 2) //reducing this BiK, at flamer's request :P
                 {
                     Notifications.AddNotification(
                         new Notification(CurseWarnBig, 2000, true).SetTextColor(Color.Red).SetTextColor(Color.Gray));
                 }
-                else if (_curseCount >= 7 && _curseCount < 9)
+                else if (_curseCount >= 3 && _curseCount <= 4)
                 {
                     Notifications.AddNotification(
                         new Notification(CurseWarnBIK, 200, true).SetTextColor(Color.Crimson)
                             .SetBoxColor(Color.FromArgb(105, 105, 105)));
                 }
-                else if (_curseCount == 9)
+                else if (_curseCount == 5)
                     Notifications.AddNotification(
                         new Notification(CurseWarnFinal, 2000, true).SetTextColor(Color.FromArgb(255, 30, 30)));
 
-                else if (_curseCount >= 10)
+                else if (_curseCount > 5)
                 {
-                    Notifications.AddNotification(new Notification(CurseWarnPunish, 1000 * (_curseCount * 10)).SetBoxColor(Color.Black).SetTextColor(Color.Red));
+                    Notifications.AddNotification(new Notification(CurseWarnPunish, 1000 * (_curseCount * 15)).SetBoxColor(Color.Black).SetTextColor(Color.Red));
                     _isPunished = true;
                     var stfu = new Timer {Interval = 1000*(_curseCount*10), Enabled = true, AutoReset = false};
                     _startTime = DateTime.Now;
@@ -208,14 +227,25 @@ namespace RageControl
         static void Program_ValueChanged(object sender, OnValueChangeEventArgs e)
         {
             if (!_main.Item("disable").GetValue<bool>())
-                Notifications.AddNotification(new Notification("Yours chat dissabled",2000).SetTextColor(Color.Red).SetBoxColor(Color.Black));
+                Notifications.AddNotification(new Notification("Your chat dissabled",2000).SetTextColor(Color.Red).SetBoxColor(Color.Black));
             else if (_main.Item("disable").GetValue<bool>())
-                Notifications.AddNotification(new Notification("Yours chat enabled",2000).SetTextColor(Color.Green).SetBoxColor(Color.Black));
+            {
+                var enableTimer = new System.Timers.Timer(30000);
+                Notifications.AddNotification(new Notification("Your chat will be enabled in 20 sec", 2000).SetTextColor(Color.Green).SetBoxColor(Color.Black));
+                enableTimer.Enabled = true;
+                enableTimer.Start();
+                enableTimer.Elapsed += enableTimer_Elapsed;
+            }
             else
             {
                 Notifications.AddNotification(new Notification("Ayee!!error detected! Tell Foxy ASAP! ERROR CODE: -2").SetTextColor(Color.White).SetBoxColor(Color.Blue));
                 Console.WriteLine("Value: " + _main.Item("disable").GetValue<bool>());
             }
+        }
+
+        static void enableTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            _isDissabled = false;
         }
         #endregion
 

@@ -25,8 +25,9 @@ namespace RageControl
         private const string CurseWarnFinal = "This is your final warning!"; // 2000
         private const string CurseWarnPunish = "Time for you to STFU for a while don't you think?"; // 2000
         private static bool _isPunished;
-        private static bool _isPermaDissabled = false;
-        private static bool _isDissabled = false;
+        private static bool _isPermaDissabled=false;
+        private static bool _isDissabled=false;
+        private static bool _bye = false;
         #endregion
         static List <string> _badWords = new List<string> { "ass", "fck", "cancer", "fak", "fcuk","bastard", "braindead", "l2p", "fk", "cunt", "dick", "fuck", "kurwa", "shit", "suck", "mom", "kid", "noob", "retard", "report", "feeder", "bronzie", "nab", "tard", "idiot", "moron", "mother" };
         static List<string>_whiteList = new List<string> { "cass", "afk", "faker", "Faker" };
@@ -41,16 +42,16 @@ namespace RageControl
 
         static void Game_OnGameLoad(EventArgs args)
         {
-            #region Menuz
             AllPlayers = ObjectManager.Get<Obj_AI_Hero>().ToList();
             if (AllPlayers.Contains(ObjectManager.Player))
                 AllPlayers.Remove(ObjectManager.Player);
             (_main = new Menu("RageControl", "RageControl", true)).AddToMainMenu();
+            
             var enableChatMenu = _main.AddSubMenu(new Menu("Disable your chat", "dyc"));
             enableChatMenu.AddItem(new MenuItem("disable", "Disable?").SetValue(false).DontSave());
-            enableChatMenu.AddItem(new MenuItem("!PERMA! Disable", "perma").SetValue(false).DontSave());
+            enableChatMenu.AddItem(new MenuItem("perma", "!PERMA! Disable").SetValue(false).DontSave());
+            
             var bannedPlayers = _main.AddSubMenu(new Menu("Ban Player?", "bannedPlayer"));
-            #endregion
             Notifications.AddNotification("Rage Control Loaded!", 1000);
             Notifications.AddNotification("Reading files....", 1000);
             ReadFiles(SandboxConfig.DataDirectory);
@@ -74,15 +75,22 @@ namespace RageControl
 
         private static void PermaDissable(object sender, OnValueChangeEventArgs e)
         {
+            if (sender == null)
+                return;
             var Sender = sender as MenuItem;
-            if (e.GetNewValue<bool>())
+            if (e.GetNewValue<bool>() && _bye==false)
             {
                 _isPermaDissabled = true;
-                Notifications.AddNotification(new Notification("Chat Perma Dissabled!",3000).SetBorderColor(Color.Red).SetBoxColor(Color.Black).SetTextColor(Color.Red));
+                _bye = true;
+                Notifications.AddNotification(new Notification("Chat Perma Dissabled!", 3000).SetBorderColor(Color.Red).SetBoxColor(Color.Black).SetTextColor(Color.Red));
                 return;
             }
-            Notifications.AddNotification(new Notification("Pssssst remember? :) Try unloading the assembly", 4000).SetBorderColor(Color.Yellow).SetBoxColor(Color.Black).SetTextColor(Color.Orange));
-            Sender.SetValue(e.GetOldValue<bool>());
+            else if (_bye==true)
+            {
+                Notifications.AddNotification(new Notification("Chat Perma Dissabled!", 3000).SetBorderColor(Color.Red).SetBoxColor(Color.Black).SetTextColor(Color.Red));
+                Notifications.AddNotification(new Notification("Pssssst remember? :) Try unloading the assembly", 4000).SetBorderColor(Color.Yellow).SetBoxColor(Color.Black).SetTextColor(Color.Orange));
+            }
+            
         }
         //going to switch totaly to OnChat sooon....
         //nah.... It works so it's fine :P
@@ -154,7 +162,7 @@ namespace RageControl
 
         static void Game_OnInput(GameInputEventArgs args)
         {
-            if (_isDissabled || _isPermaDissabled==true)
+            if (_isDissabled==true || _isPermaDissabled==true)
             {
                 Notifications.AddNotification("You disabled chat :S",1500).Border(true).SetBoxColor(Color.Black).SetTextColor(Color.Orange).SetBorderColor(Color.Red);
                 args.Process = false;
@@ -227,7 +235,10 @@ namespace RageControl
         static void Program_ValueChanged(object sender, OnValueChangeEventArgs e)
         {
             if (!_main.Item("disable").GetValue<bool>())
-                Notifications.AddNotification(new Notification("Your chat dissabled",2000).SetTextColor(Color.Red).SetBoxColor(Color.Black));
+            {
+                Notifications.AddNotification(new Notification("Your chat dissabled", 2000).SetTextColor(Color.Red).SetBoxColor(Color.Black));
+                _isDissabled = true;
+            }
             else if (_main.Item("disable").GetValue<bool>())
             {
                 var enableTimer = new System.Timers.Timer(30000);
@@ -245,6 +256,7 @@ namespace RageControl
 
         static void enableTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
+            Notifications.AddNotification(new Notification("Enabled :)", 2000).SetBorderColor(Color.Green).SetBoxColor(Color.Black).SetTextColor(Color.Green));
             _isDissabled = false;
         }
         #endregion

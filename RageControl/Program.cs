@@ -30,7 +30,7 @@ namespace RageControl
         private static bool _bye = false;
         #endregion
         static List <string> _badWords = new List<string> { "ass", "fck", "cancer", "fak", "fcuk","bastard", "braindead", "l2p", "fk", "cunt", "dick", "fuck", "kurwa", "shit", "suck", "mom", "kid", "noob", "retard", "report", "feeder", "bronzie", "nab", "tard", "idiot", "moron", "mother" };
-        static List<string>_whiteList = new List<string> { "cass", "afk", "faker", "Faker" };
+        static List<string> _whiteList = new List<string> { "cass", "afk", "faker", "Faker", "/msg", "/w" };
         static List<Obj_AI_Hero> AllPlayers;
         static List<string> BannedPlayers = new List<string>();
 

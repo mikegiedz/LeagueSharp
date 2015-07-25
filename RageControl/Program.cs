@@ -30,7 +30,7 @@ namespace RageControl
         private static bool _bye = false;
         #endregion
         static List <string> _badWords = new List<string> { "ass", "fck", "cancer", "fak", "fcuk","bastard", "braindead", "l2p", "fk", "cunt", "dick", "fuck", "kurwa", "shit", "suck", "mom", "kid", "noob", "retard", "report", "feeder", "bronzie", "nab", "tard", "idiot", "moron", "mother" };
-        static List<string> _whiteList = new List<string> { "cass", "afk", "faker", "Faker", "/msg", "/w" };
+        static List<string> _whiteList = new List<string> { "cass", "afk", "faker", "Faker", "/msg", "/w", "dragon", "baron", "lag" };
         static List<Obj_AI_Hero> AllPlayers;
         static List<string> BannedPlayers = new List<string>();
 
@@ -164,6 +164,14 @@ namespace RageControl
         {
             if (_isDissabled==true || _isPermaDissabled==true)
             {
+                foreach (var whiteword in _whiteList)
+                {
+                    if (args.Input.Contains(whiteword))
+                    {
+                        args.Process=true;
+                        return;
+                    }
+                }
                 Notifications.AddNotification("You disabled chat :S",1500).Border(true).SetBoxColor(Color.Black).SetTextColor(Color.Orange).SetBorderColor(Color.Red);
                 args.Process = false;
                 return;

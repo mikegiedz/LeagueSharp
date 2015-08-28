@@ -69,6 +69,9 @@ namespace RageControl
                     item.ValueChanged += item_ValueChanged;
                 }
             }
+            bannedPlayers.AddItem(new MenuItem("allyban", "Ban all allies? :S").SetValue(false).DontSave());
+            bannedPlayers.AddItem(new MenuItem("enemiesban", "Ban all enemies?").SetValue(false).DontSave());
+            bannedPlayers.AddItem(new MenuItem("allban", "Ban all players? :S").SetValue(false).DontSave());
             Game.OnInput += Game_OnInput;
             Game.OnChat += Game_OnChat;
         }
@@ -83,9 +86,8 @@ namespace RageControl
                 _isPermaDissabled = true;
                 _bye = true;
                 Notifications.AddNotification(new Notification("Chat Perma Dissabled!", 3000).SetBorderColor(Color.Red).SetBoxColor(Color.Black).SetTextColor(Color.Red));
-                return;
             }
-            else if (_bye==true)
+            else if (_bye)
             {
                 Notifications.AddNotification(new Notification("Chat Perma Dissabled!", 3000).SetBorderColor(Color.Red).SetBoxColor(Color.Black).SetTextColor(Color.Red));
                 Notifications.AddNotification(new Notification("Pssssst remember? :) Try unloading the assembly", 4000).SetBorderColor(Color.Yellow).SetBoxColor(Color.Black).SetTextColor(Color.Orange));
@@ -107,17 +109,77 @@ namespace RageControl
         {
             if (sender == null)
             {
-                Notifications.AddNotification(new Notification("sender is null", 3000));
+                Notifications.AddNotification(new Notification("sender is null! Report to Foxy...", 3000));
                 return;
             }
             var newSender = sender as MenuItem;
+            if (newSender == null)
+                return;
             if (e.GetNewValue<bool>())
             {
+                switch (newSender.Name)
+                {
+                    case "allyban":
+                        foreach (var player in AllPlayers.Where(player => (player.IsAlly && BannedPlayers.Contains(player.Name))))
+                        {
+                            BannedPlayers.Add(player.Name);
+                        }
+                        Notifications.AddNotification(new Notification("Ally team chat banned!", 2000).SetBoxColor(Color.Black).SetTextColor(Color.Orange));
+                        break;
+                    case "enemyban":
+                        foreach (var player in AllPlayers.Where(player => (player.IsEnemy && !BannedPlayers.Contains(player.Name))))
+                        {
+                            BannedPlayers.Add(player.Name);
+                        }
+                        Notifications.AddNotification(new Notification("Enemy chat banned!", 2000).SetBoxColor(Color.Black).SetTextColor(Color.Orange));
+                        break;
+                    case "allban":
+                        foreach (var player in AllPlayers.Where(player => !BannedPlayers.Contains(player.Name)))
+                        {
+                            BannedPlayers.Add(player.Name);
+                        }
+                        Notifications.AddNotification(new Notification("All chat banned :S This is usually bad idea :(", 2000).SetBoxColor(Color.Black).SetTextColor(Color.Orange));
+                        break;
+                }
+                if (BannedPlayers.Contains(newSender.Name))
+                {
+                    Notifications.AddNotification(new Notification("He is banned already, you used teambans", 2000).SetBoxColor(Color.Black).SetTextColor(Color.Orange));
+                    return;
+                }
                 BannedPlayers.Add(newSender.Name);
-                Notifications.AddNotification(new Notification(newSender.Name + " banned!",2000).SetBoxColor(Color.Black).SetTextColor(Color.Orange));
+                Notifications.AddNotification(new Notification(newSender.Name + " banned!", 2000).SetBoxColor(Color.Black).SetTextColor(Color.Orange));
             }
             else
             {
+                switch (newSender.Name)
+                {
+                    case "allyban":
+                        foreach (var player in AllPlayers.Where(player => (player.IsAlly && BannedPlayers.Contains(player.Name))))
+                        {
+                            BannedPlayers.Remove(player.Name);
+                        }
+                        Notifications.AddNotification(new Notification("Ally team chat unbaned! :)", 2000).SetBoxColor(Color.Black).SetTextColor(Color.GreenYellow));
+                        break;
+                    case "enemyban":
+                        foreach (var player in AllPlayers.Where(player => (player.IsEnemy && BannedPlayers.Contains(player.Name))))
+                        {
+                            BannedPlayers.Remove(player.Name);
+                        }
+                        Notifications.AddNotification(new Notification("Enemy chat unbanned! :)", 2000).SetBoxColor(Color.Black).SetTextColor(Color.GreenYellow));
+                        break;
+                    case "allban":
+                        foreach (var player in AllPlayers.Where(player => BannedPlayers.Contains(player.Name)))
+                        {
+                            BannedPlayers.Remove(player.Name);
+                            Notifications.AddNotification(new Notification("All players unbanned :)", 2000).SetBoxColor(Color.Black).SetTextColor(Color.GreenYellow));
+                        }
+                        break;
+                }
+                if (!BannedPlayers.Contains(newSender.Name))
+                {
+                    Notifications.AddNotification(new Notification("He is not banned. You used teamunban probs :S", 2000).SetBoxColor(Color.Black).SetTextColor(Color.GreenYellow));
+                    return;
+                }
                 BannedPlayers.Remove(newSender.Name);
                 Notifications.AddNotification(new Notification(newSender.Name + " unbaned! :)", 2000).SetBoxColor(Color.Black).SetTextColor(Color.GreenYellow));
             }
@@ -139,7 +201,7 @@ namespace RageControl
             }
             catch (Exception e)
             {
-                Notifications.AddNotification(new Notification("Error with blacklist: " + e.Message, 2000, true).SetBoxColor(Color.Black).SetTextColor(Color.Red));
+                Notifications.AddNotification(new Notification("Not using text files. You can add words to block (check thread for info)", 2000, true).SetBoxColor(Color.Black).SetTextColor(Color.Red));
             }
             try
             {
@@ -155,7 +217,7 @@ namespace RageControl
             }
             catch (Exception e)
             {
-                Notifications.AddNotification(new Notification("Error with whitelist" + e.Message,1000).SetBoxColor(Color.Black).SetTextColor(Color.Red));
+                Notifications.AddNotification(new Notification("You can add words to bypass blocking too! (check thread for info)", 1000).SetBoxColor(Color.Black).SetTextColor(Color.Red));
             }
         }
 

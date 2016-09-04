@@ -20,10 +20,10 @@ namespace RageControl
         private static int _curseCount;
         private static string _curseWord;
         private const string CurseWarn = "Words Blocked: "; // 2000
-        private const string CurseWarnBig = "You'll get banned."; // 2000;
-        private const string CurseWarnBIK = "You will get banned.;
-        private const string CurseWarnFinal = "You will get banned."; // 2000
-        private const string CurseWarnPunish = "Chat blocked to prevent rage."; // 2000
+        private const string CurseWarnBig = "Just saved you from a ban"; // 2000;
+        private const string CurseWarnBIK = "You will get banned"; // 2000
+        private const string CurseWarnFinal = "You will get banned"; // 2000
+        private const string CurseWarnPunish = "Chat blocked to prevent rage"; // 2000
         private static bool _isPunished;
         private static bool _isPermaDissabled=false;
         private static bool _isDissabled=false;

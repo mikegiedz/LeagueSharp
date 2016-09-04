@@ -264,11 +264,11 @@ namespace RageControl
             if (args.Process == false)
             {
                 Notifications.AddNotification(
-                    new Notification(CurseWarn + _curseWord, 2000, true).SetTextColor(Color.FromArgb(255,100,0)).SetBoxColor(Color.Gray));
+                    new Notification(CurseWarn + _curseWord, 2000, true).SetTextColor(Color.Blue)).SetBoxColor(Color.Gray));
                 if (_curseCount >= 2) //reducing this BiK, at flamer's request :P
                 {
                     Notifications.AddNotification(
-                        new Notification(CurseWarnBig, 2000, true).SetTextColor(Color.Red).SetTextColor(Color.Gray));
+                        new Notification(CurseWarnBig, 2000, true).SetTextColor(Color.Blue).SetTextColor(Color.Black));
                 }
                 else if (_curseCount >= 3 && _curseCount <= 4)
                 {

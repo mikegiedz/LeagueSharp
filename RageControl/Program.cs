@@ -71,7 +71,7 @@ namespace RageControl
             }
             bannedPlayers.AddItem(new MenuItem("allyban", "Ban all allies? :S").SetValue(false).DontSave());
             bannedPlayers.AddItem(new MenuItem("enemiesban", "Ban all enemies?").SetValue(false).DontSave());
-            bannedPlayers.AddItem(new MenuItem("allban", "Ban all players? :S").SetValue(false).DontSave());
+            bannedPlayers.AddItem(new MenuItem("allban", "Ban all players?").SetValue(false).DontSave());
             Game.OnInput += Game_OnInput;
             Game.OnChat += Game_OnChat;
         }
@@ -264,25 +264,25 @@ namespace RageControl
             if (args.Process == false)
             {
                 Notifications.AddNotification(
-                    new Notification(CurseWarn + _curseWord, 2000, true).SetTextColor(Color.Blue)).SetBoxColor(Color.Gray));
+                    new Notification(CurseWarn + _curseWord, 2000, true).SetTextColor(Color.Blue)).SetBoxColor(Color.White));
                 if (_curseCount >= 2) //reducing this BiK, at flamer's request :P
                 {
                     Notifications.AddNotification(
-                        new Notification(CurseWarnBig, 2000, true).SetTextColor(Color.Blue).SetTextColor(Color.Black));
+                        new Notification(CurseWarnBig, 2000, true).SetTextColor(Color.White).SetTextColor(Color.Black));
                 }
                 else if (_curseCount >= 3 && _curseCount <= 4)
                 {
                     Notifications.AddNotification(
-                        new Notification(CurseWarnBIK, 200, true).SetTextColor(Color.Crimson)
-                            .SetBoxColor(Color.FromArgb(105, 105, 105)));
+                        new Notification(CurseWarnBIK, 200, true).SetTextColor(Color.White)
+                            .SetBoxColor(Color.Black));
                 }
                 else if (_curseCount == 5)
                     Notifications.AddNotification(
-                        new Notification(CurseWarnFinal, 2000, true).SetTextColor(Color.FromArgb(255, 30, 30)));
+                        new Notification(CurseWarnFinal, 2000, true).SetTextColor(Color.White));
 
                 else if (_curseCount > 5)
                 {
-                    Notifications.AddNotification(new Notification(CurseWarnPunish, 1000 * (_curseCount * 15)).SetBoxColor(Color.Black).SetTextColor(Color.Red));
+                    Notifications.AddNotification(new Notification(CurseWarnPunish, 1000 * (_curseCount * 15)).SetBoxColor(Color.White).SetTextColor(Color.Black));
                     _isPunished = true;
                     var stfu = new Timer {Interval = 1000*(_curseCount*10), Enabled = true, AutoReset = false};
                     _startTime = DateTime.Now;
